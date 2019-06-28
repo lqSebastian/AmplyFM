@@ -1,28 +1,19 @@
 package com.cibertec.amplyfm.adapters;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.cibertec.amplyfm.R;
-import com.cibertec.amplyfm.models.Album;
 import com.cibertec.amplyfm.models.FavoriteTracks.FavoriteItem;
-import com.cibertec.amplyfm.models.Track;
 import com.cibertec.amplyfm.ui.fragments.FavoritesFragment;
-import com.cibertec.amplyfm.ui.fragments.TopTracksFragment;
-import com.cibertec.amplyfm.utils.DurationConverter;
 import com.cibertec.amplyfm.utils.ImageSaver;
 
 public class FavoritesRecyclerViewAdapter   extends RecyclerView.Adapter<FavoritesRecyclerViewAdapter.ViewHolder>{
@@ -54,12 +45,16 @@ public class FavoritesRecyclerViewAdapter   extends RecyclerView.Adapter<Favorit
         holder.albumView.setText(dm.getAlbum());
         holder.durationView.setText(dm.getDuration());
 
-        Bitmap bitmap = new ImageSaver(holder.imageView.getContext()).
-                setFileName(dm.getImageDir()).
-                setDirectoryName("AmplyFMLocalImages").
-                load();
+        if (holder.imageView.getDrawable() == null) {
+            Bitmap bitmap = new ImageSaver(holder.imageView.getContext()).
+                    setFileName(dm.getImageDir()).
+                    setDirectoryName("AmplyFMLocalImages").
+                    load();
+            holder.progressBar.setVisibility(View.GONE);
 
-        holder.imageView.setImageBitmap(bitmap);
+            holder.imageView.setImageBitmap(bitmap);
+        }
+
         holder.mView.setOnClickListener(v -> {
             if (null != interactionListener) {
                // Album album = new Album();
@@ -69,12 +64,9 @@ public class FavoritesRecyclerViewAdapter   extends RecyclerView.Adapter<Favorit
                 interactionListener.onListFragmentInteraction(holder.favoriteItem);
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                setPosition(holder.getAdapterPosition());
-                return false;
-            }
+        holder.itemView.setOnLongClickListener(v -> {
+            setPosition(holder.getAdapterPosition());
+            return false;
         });
     }
 
@@ -98,6 +90,7 @@ public class FavoritesRecyclerViewAdapter   extends RecyclerView.Adapter<Favorit
         public final TextView albumView;
         public final TextView durationView;
         public final ImageView imageView;
+        public final ProgressBar progressBar;
         public FavoriteItem favoriteItem;
 
         public ViewHolder(View view) {
@@ -110,6 +103,7 @@ public class FavoritesRecyclerViewAdapter   extends RecyclerView.Adapter<Favorit
             trackNameView = (TextView) view.findViewById(R.id.tv_track_name);
             playCountView = view.findViewById(R.id.tv_plays);
             durationView = (TextView) view.findViewById(R.id.tv_duration);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBar1);
 
             view.setOnCreateContextMenuListener(this);
         }

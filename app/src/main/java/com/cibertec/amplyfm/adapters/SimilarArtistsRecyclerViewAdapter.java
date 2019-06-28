@@ -1,16 +1,12 @@
 package com.cibertec.amplyfm.adapters;
 
-import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import com.bumptech.glide.Glide;
 import com.cibertec.amplyfm.R;
@@ -45,6 +41,7 @@ public class SimilarArtistsRecyclerViewAdapter extends RecyclerView.Adapter<Simi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // get the layout and inflate
+
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.similar_artist_prototype, parent, false);
         retrofit = new Retrofit.Builder()

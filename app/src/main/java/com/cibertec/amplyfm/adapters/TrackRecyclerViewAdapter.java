@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,8 +29,6 @@ import com.google.gson.GsonBuilder;
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -39,20 +38,28 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
     private final Track[] trackList;
     private final TopTracksFragment.OnListFragmentInteractionListener interactionListener;
     public int position;
-    Retrofit retrofitBing;
+    static Retrofit retrofitBing;
 
-    Retrofit retrofitLastFM;
-    String imageUrl;
+    static Retrofit retrofitLastFM;
+    static String imageUrl;
 
+    private AsyncTask mTask;
 
     public TrackRecyclerViewAdapter(Track[] items, TopTracksFragment.OnListFragmentInteractionListener listener) {
+        try {
+            //cancelar todos los async por si se hacen busquedas seguidas en corto plazo
+            mTask.cancel(true);
+        } catch (Exception e) {
+        }
         trackList = items;
         interactionListener = listener;
     }
 
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // get the layout and inflate
+
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.track_prototype, parent, false);
         Gson gson = new GsonBuilder()
@@ -75,6 +82,16 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
     }
 
     @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Track dm = trackList[position];
 
@@ -82,49 +99,41 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
         holder.trackNameView.setText(dm.getName());
         holder.playCountView.setText(String.valueOf(dm.getPlaycount()));
 
-        GetTrackInfo getTrackInfo = retrofitLastFM.create(GetTrackInfo.class);
-        Call<TrackInfoResponse> trackInfoCall = getTrackInfo.getTrackInfo(dm.getArtist().getName(), dm.getName(), Constants.API_KEY);
-        trackInfoCall.enqueue(new Callback<TrackInfoResponse>() {
-            @Override
-            public void onResponse(Call<TrackInfoResponse> call, Response<TrackInfoResponse> response) {
-                if (response.isSuccessful()) {
-                    TrackInfoResponse trackInfoResponse = response.body();
-                    Track track = trackInfoResponse.getTrack();
 
-                    holder.trackItem.setAlbum(track.getAlbum());
+        if (dm.getImgUrl() != null) {
 
-                    String albumTitle;
-                    try {
-                                                albumTitle = track.getAlbum().getTitle();
+            holder.trackItem.setAlbum(dm.getAlbum());
 
+            String albumTitle;
+            try {
+                albumTitle = dm.getAlbum().getTitle();
 
+            } catch (Exception e) {
+                albumTitle = "";
+            }
+            holder.albumView.setText(albumTitle);
 
-                                         String a;
+            String duration;
+            try {
+                duration = DurationConverter.getDurationInMinutesText(Long.parseLong(dm.getDuration()));
 
-                    } catch (Exception e) {
-                        albumTitle = "";
-                    }
+            } catch (Exception e) {
+                duration = dm.getDuration();
+            }
+            holder.durationView.setText(duration);
 
-                    holder.albumView.setText(albumTitle);
-
-                    String duration = DurationConverter.getDurationInMinutesText(Long.parseLong(track.getDuration()));
-                    holder.trackItem.setDuration(duration);
-                    holder.durationView.setText(duration);
-
-
-
-                }
-
+            if (holder.imageView.getDrawable() == null && dm.getImgUrl() != null) {
+                Glide.with(holder.imageView.getContext())
+                        .load(dm.getImgUrl())
+                        .into(holder.imageView);
+                holder.progressBar.setVisibility(View.GONE);
             }
 
-            @Override
-            public void onFailure(Call<TrackInfoResponse> call, Throwable t) {
-                Log.e("fail", t.getMessage() + " " + t.getCause());
 
-            }
+        } else {
+            mTask = new LongOperation(position, trackList).execute();
 
-        });
-
+        }
 
         holder.mView.setOnClickListener(v -> {
             if (null != interactionListener) {
@@ -133,12 +142,9 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
                 interactionListener.onListFragmentInteraction(holder.trackItem);
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                setPosition(holder.getAdapterPosition());
-                return false;
-            }
+        holder.itemView.setOnLongClickListener(v -> {
+            setPosition(holder.getAdapterPosition());
+            return false;
         });
     }
 
@@ -159,6 +165,11 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
         return trackList[position];
     }
 
+    public void updateTrackList(Track dm, int pos) {
+        trackList[pos] = dm;
+        this.notifyDataSetChanged();
+    }
+
 
     // Class for prototyping fields we're going to fill
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
@@ -168,6 +179,7 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
         public final TextView albumView;
         public final ImageView imageView;
         public final TextView durationView;
+        public final ProgressBar progressBar;
         public Track trackItem;
 
         public ViewHolder(View view) {
@@ -179,6 +191,7 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
             playCountView = view.findViewById(R.id.tv_plays);
             imageView = view.findViewById(R.id.iv_track);
             durationView = (TextView) view.findViewById(R.id.tv_duration);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBar1);
 
             view.setOnCreateContextMenuListener(this);
 
@@ -192,42 +205,60 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
     }
 
     private class LongOperation extends AsyncTask<String, Void, String> {
-        ViewHolder holder;
-        String artistName;
-        String albumTitle;
+        int positionAsync;
+        Track[] tracksAsync;
 
-        public LongOperation(ViewHolder holder, String artistName, String albumTitle) {
-            this.holder = holder;
-            this.artistName = artistName;
-            this.albumTitle = albumTitle;
+        Track dm;
+
+        public LongOperation(int position, Track[] tracksAsync) {
+            this.positionAsync = position;
+            this.tracksAsync = tracksAsync;
         }
 
         @Override
         protected String doInBackground(String... params) {
             try {
 
+
+                dm = tracksAsync[positionAsync];
+                GetTrackInfo getTrackInfo = retrofitLastFM.create(GetTrackInfo.class);
+                Call<TrackInfoResponse> trackInfoCall = getTrackInfo.getTrackInfo(dm.getArtist().getName(), dm.getName(), Constants.API_KEY);
+
+                TrackInfoResponse trackInfoResponse = trackInfoCall.execute().body();
+                dm = trackInfoResponse.getTrack();
+                String albumTitle;
+                try {
+                    albumTitle = dm.getAlbum().getTitle();
+
+                } catch (Exception e) {
+                    albumTitle = "";
+                }
+
                 GetImage getImage = retrofitBing.create(GetImage.class);
 
-                Call<ImageResponse> imageResponseCall = getImage.getImage(artistName + " " + albumTitle);
+                Call<ImageResponse> imageResponseCall = getImage.getImage(dm.getArtist().getName() + " " + albumTitle);
+
+
                 ImageResponse imageResponse = imageResponseCall.execute().body();
                 List<Value> items = imageResponse.getValue();
                 imageUrl = items.get(0).getThumbnailUrl();
-                holder.trackItem.setUrl(imageUrl);
-                Glide.with(holder.imageView.getContext())
-                        .load(imageUrl)
-                        .into(holder.imageView);
 
+                dm.setImgUrl(imageUrl);
+
+                tracksAsync[positionAsync] = dm;
+
+                Log.d("N° DE ITEM REQUEST", String.valueOf(positionAsync));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return "Executed";
+            return imageUrl;
         }
 
         @Override
         protected void onPostExecute(String result) {
+            super.onPostExecute(result);
 
-            // might want to change "executed" for the returned string passed
-            // into onPostExecute() but that is upto you
+            updateTrackList(trackList[positionAsync], positionAsync);
         }
 
         @Override

@@ -1,18 +1,21 @@
 package com.cibertec.amplyfm.ui.fragments;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -22,24 +25,13 @@ import com.cibertec.amplyfm.R;
 import com.cibertec.amplyfm.adapters.TrackRecyclerViewAdapter;
 import com.cibertec.amplyfm.models.FavoriteTracks.FavoriteItem;
 import com.cibertec.amplyfm.models.Lyrics.Lyrics;
-import com.cibertec.amplyfm.models.TopTracksResponse;
 import com.cibertec.amplyfm.models.Track;
 import com.cibertec.amplyfm.network.GetLyrics;
-import com.cibertec.amplyfm.network.TopArtistTracksService;
 import com.cibertec.amplyfm.ui.MainActivity;
 import com.cibertec.amplyfm.ui.dialogs.LyricsDialog;
 import com.cibertec.amplyfm.utils.Constants;
 import com.cibertec.amplyfm.utils.DialogFactory;
 import com.cibertec.amplyfm.utils.ImageSaver;
-import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.ViewHolder;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.UUID;
 
@@ -88,9 +80,10 @@ public class TopTracksFragment extends Fragment {
 
         Context context = view.getContext();
          recyclerView = (RecyclerView) view;
-
+        TrackRecyclerViewAdapter recyclerViewAdapter = new TrackRecyclerViewAdapter(trackList, interactionListener);
+        recyclerViewAdapter.setHasStableIds(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setAdapter(new TrackRecyclerViewAdapter(trackList, interactionListener));
+        recyclerView.setAdapter(recyclerViewAdapter);
 
         return view;
     }
@@ -196,10 +189,10 @@ public class TopTracksFragment extends Fragment {
                 trackId = trackItem.getMbid() + ".png";
             }
 
-                if(trackItem.getUrl() != "") {
+            if (trackItem.getImgUrl() != null) {
                     Glide.with(getActivity())
                             .asBitmap()
-                            .load(trackItem.getUrl())
+                            .load(trackItem.getImgUrl())
                             .into(new CustomTarget<Bitmap>() {
                                 @Override
                                 public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {

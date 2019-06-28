@@ -28,7 +28,15 @@ public class Track implements Parcelable {
         this.album = album;
     }
 
+    private String imgUrl;
 
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
 
     @SerializedName("playcount")
     private String playcount;
@@ -131,6 +139,7 @@ public class Track implements Parcelable {
         artist = (Artist) in.readValue(Artist.class.getClassLoader());
         album = (Album) in.readValue(Album.class.getClassLoader());
         url = in.readString();
+        imgUrl = in.readString();
     }
 
     @Override
@@ -153,6 +162,8 @@ public class Track implements Parcelable {
         dest.writeValue(artist);
         dest.writeValue(album);
         dest.writeString(url);
+        dest.writeString(imgUrl);
+
     }
 
     @SuppressWarnings("unused")
