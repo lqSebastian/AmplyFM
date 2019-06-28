@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">AmplyFM</string>
+    <string name="search_artist">Busca</string>
+    <string name="search_artist_hint">Buscar artistas</string>
+    <string name="tv_minutos">minutos</string>
+    <string name="tv_plays">reproducciones</string>
+    <string name="play_button">Play Button</string>
+    <string name="artist_image">Artist image</string>
+    <string name="track_image">Track Image</string>
+    <string name="artist_picture" />
+    <string name="top10_tab">Top 10</string>
+    <string name="favorites_string">Favoritos</string>
+    <string name="favorites_string_title">Favoritos</string>
+    <string name="text_oyentes" />
+    <string name="text_oyentes_nro">oyentes</string>
+
+    <string name="dialog_action_ok">OK</string>
+    <string name="generic_error_title">Error</string>
+    <string name="lyrics_for">Letra</string>
+    <string name="cerrar_string">Cerrar</string>
+    <string name="copy_to_clipboard" />
+    <string name="copy_to">Copiar todo</string>
+</resources>

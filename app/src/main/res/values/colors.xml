@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#CC0000</color>
+    <color name="colorPrimaryDark">#B90000</color>
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="colorDarkGrey">#161616</color>
+    <color name="colorSeparatorGrey">#A7A7A7</color>
+
+
+    <color name="app_window_bglight_color">#262626</color>
+
+
+    <color name="app_text_label">#BFBFBF</color>
+    <color name="blue_light">#33B5E5</color>
+    <color name="purple_light">#AA66CC</color>
+    <color name="green_light">#99CC00</color>
+    <color name="orange_light">#FFBB33</color>
+    <color name="red_light">#FF4444</color>
+
+    <color name="blue_dark">#0099CC</color>
+    <color name="purple_dark">#9933CC</color>
+    <color name="green_dark">#669900</color>
+    <color name="orange_dark">#FF8800</color>
+    <color name="red_dark">#CC0000</color>
+
+    <color name="material_pink">#e91e63</color>
+    <color name="material_purple">#673ab7</color>
+    <color name="material_blue">#5677fc</color>
+    <color name="material_red">#ff4444</color>
+    <color name="material_green">#669900</color>
+    <color name="material_yellow">#ff8800</color>
+    <color name="white">#ffffffff</color>
+    <color name="yellow">#ffffff00</color>
+    <color name="fuchsia">#ffff00ff</color>
+    <color name="red">#ffff0000</color>
+    <color name="silver">#ffc0c0c0</color>
+    <color name="olive">#ff808000</color>
+    <color name="purple">#ff800080</color>
+    <color name="maroon">#ff800000</color>
+    <color name="aqua">#ff00ffff</color>
+    <color name="lime">#ff00ff00</color>
+    <color name="teal">#ff008080</color>
+    <color name="green">#ff008000</color>
+    <color name="blue">#ff0000ff</color>
+    <color name="navy">#ff000080</color>3
+    <color name="White">#ffffffff</color>
+
+    <color name="MistyRose">#ffffe4e1</color>
+    <color name="Bisque">#ffffe4c4</color>
+    <color name="Moccasin">#ffffe4b5</color>
+</resources>

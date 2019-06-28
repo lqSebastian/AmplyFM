@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:id="@+id/cv_track_item"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ripple_background"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:id="@+id/rl_trackImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_track"
+                android:layout_width="@dimen/track_image_width"
+                android:layout_height="@dimen/track_image_height"
+                android:layout_marginTop="@dimen/margin8"
+                android:contentDescription="@string/track_image" />
+
+            <ProgressBar
+                android:id="@+id/progressBar1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true" />
+
+        </RelativeLayout>
+
+
+        <TextView
+            android:id="@+id/tv_track_name"
+            style="@style/ALbumTitleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="@dimen/margin5"
+            android:layout_marginTop="@dimen/margin8"
+            android:layout_marginEnd="@dimen/margin5"
+            android:layout_marginBottom="@dimen/margin1"
+            android:layout_toEndOf="@+id/rl_trackImage"
+            android:textColor="@color/colorAccent" />
+
+        <TextView
+            android:id="@+id/tv_track_album"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_track_name"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="@dimen/margin5"
+            android:layout_marginTop="@dimen/margin1"
+            android:layout_marginEnd="@dimen/margin5"
+            android:layout_marginBottom="@dimen/margin4"
+            android:layout_toEndOf="@+id/rl_trackImage"
+            android:textSize="12sp" />
+
+
+        <LinearLayout
+            android:id="@+id/lnr_plays"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_track_album"
+            android:layout_marginTop="@dimen/margin1"
+            android:layout_marginBottom="@dimen/margin1"
+            android:layout_toEndOf="@+id/rl_trackImage"
+            android:orientation="horizontal">
+
+            <ImageView
+
+                android:id="@+id/iv_play"
+                android:layout_width="21dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/margin4"
+                android:contentDescription="@string/play_button"
+                android:src="@drawable/play_icon" />
+
+            <TextView
+                android:id="@+id/tv_plays"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/margin2"
+                android:layout_marginBottom="@dimen/margin2"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="@dimen/margin2"
+                android:text="@string/tv_plays"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lnr_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lnr_plays"
+            android:layout_marginStart="@dimen/margin5"
+            android:layout_toEndOf="@+id/rl_trackImage"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin1"
+                android:layout_marginEnd="@dimen/margin1"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin1"
+                android:layout_marginTop="@dimen/margin1"
+                android:text="@string/tv_minutos"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
