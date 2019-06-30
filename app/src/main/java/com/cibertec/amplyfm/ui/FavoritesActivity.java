@@ -84,7 +84,6 @@ public class FavoritesActivity extends AppCompatActivity implements FavoritesFra
     @Override
     public void onBackPressed() {
         finish();
-        return;
     }
 
 
@@ -150,7 +149,14 @@ public class FavoritesActivity extends AppCompatActivity implements FavoritesFra
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-      loadItems();
-        return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.item_favorites:
+                loadItems();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

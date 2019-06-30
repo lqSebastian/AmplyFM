@@ -1,19 +1,12 @@
 package com.cibertec.amplyfm.ui.fragments;
 
-import androidx.fragment.app.FragmentTransaction;
-
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,9 +16,18 @@ import com.cibertec.amplyfm.AppDatabase;
 import com.cibertec.amplyfm.R;
 import com.cibertec.amplyfm.adapters.FavoritesRecyclerViewAdapter;
 import com.cibertec.amplyfm.models.FavoriteTracks.FavoriteItem;
-import com.cibertec.amplyfm.models.Track;
+import com.cibertec.amplyfm.models.Lyrics.Lyrics;
+import com.cibertec.amplyfm.network.GetLyrics;
 import com.cibertec.amplyfm.ui.FavoritesActivity;
+import com.cibertec.amplyfm.ui.dialogs.LyricsDialog;
+import com.cibertec.amplyfm.utils.Constants;
 import com.cibertec.amplyfm.utils.DialogFactory;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FavoritesFragment extends Fragment {
 
@@ -101,6 +103,37 @@ public class FavoritesFragment extends Fragment {
         int itemId = item.getItemId();
         FavoriteItem favoriteItem;
         switch (itemId) {
+            case 4:
+                DialogFactory.loading_toast(getActivity(), "Obteniendo letra").show();
+                favoriteItem = favoriteItems[position];
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(Constants.BASE_URL_OVH)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+                GetLyrics getLyrics = retrofit.create(GetLyrics.class);
+                Call<Lyrics> searchLyrics = getLyrics.getLyrics(favoriteItem.getArtist(), favoriteItem.getName());
+
+                searchLyrics.enqueue(new Callback<Lyrics>() {
+                    @Override
+                    public void onResponse(Call<Lyrics> call, Response<Lyrics> response) {
+                        Lyrics lyrics = response.body();
+
+                        if (lyrics == null) {
+                            DialogFactory.warning_toast(getActivity(), "No se encontró letra para esta canción").show();
+                        } else {
+                            LyricsDialog lyricsDialog = LyricsDialog.newInstance(lyrics.getLyrics(), "Letra de " + favoriteItem.getName());
+                            lyricsDialog.setCancelable(false);
+                            lyricsDialog.show(getFragmentManager(), "LyricsDialog");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Lyrics> call, Throwable t) {
+                        DialogFactory.warning_toast(getActivity(), "No se encontró letra para esta canción").show();
+                    }
+                });
+
+                break;
             case 3:
                 favoriteItem = favoriteItems[position];
                 try {

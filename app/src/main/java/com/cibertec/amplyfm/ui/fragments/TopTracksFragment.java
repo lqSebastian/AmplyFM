@@ -31,6 +31,7 @@ import com.cibertec.amplyfm.ui.MainActivity;
 import com.cibertec.amplyfm.ui.dialogs.LyricsDialog;
 import com.cibertec.amplyfm.utils.Constants;
 import com.cibertec.amplyfm.utils.DialogFactory;
+import com.cibertec.amplyfm.utils.DurationConverter;
 import com.cibertec.amplyfm.utils.ImageSaver;
 
 import java.util.UUID;
@@ -216,10 +217,15 @@ public class TopTracksFragment extends Fragment {
            albumName = trackItem.getAlbum().getTitle();
 
             }
+            String duration;
+            try {
+                duration = DurationConverter.getDurationInMinutesText(Long.parseLong(trackItem.getDuration()));
 
-
+            } catch (Exception e) {
+                duration = trackItem.getDuration();
+            }
         FavoriteItem favoriteItem = new FavoriteItem(trackId, trackItem.getName(),
-                albumName,trackItem.getPlaycount(),trackItem.getDuration(), MainActivity.CURRENT_ARTIST,trackId);
+                albumName, trackItem.getPlaycount(), duration, MainActivity.CURRENT_ARTIST, trackId);
 
         AppDatabase.getInstance(getActivity()).favoriteDao().insertFavorites(favoriteItem);
 

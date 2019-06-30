@@ -99,8 +99,7 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
         getLifecycle().addObserver(youTubePlayerView);
 
-        MAX_RESULTS = Integer.valueOf(PowerPreference.getDefaultFile().getString("results_number", "10"));
-        AUTO_PLAY = PowerPreference.getDefaultFile().getBoolean("auto_play", false);
+        setPreferences();
         retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -211,7 +210,7 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
                     Id id = items.get(0).getId();
 
                     String videoId = id.getVideoId();
-
+                    AUTO_PLAY = PowerPreference.getDefaultFile().getBoolean("auto_play", false);
                     if (AUTO_PLAY) {
                         youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
                             youTubePlayer.loadVideo(videoId, 0);
@@ -250,6 +249,8 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
     private String searchArtisTracks(final String query){
         edt_search.setText(query);
+        MAX_RESULTS = Integer.valueOf(PowerPreference.getDefaultFile().getString("results_number", "10"));
+
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -388,6 +389,7 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
                 return true;
             case R.id.action_config:
                 startActivity(new Intent(this, SettingsActivity.class));
+                return true;
             case R.id.action_exit:
                 finish();
                 return true;
@@ -407,6 +409,15 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void onReturned() {
+        setPreferences();
+    }
+
+    public void setPreferences() {
+        MAX_RESULTS = Integer.valueOf(PowerPreference.getDefaultFile().getString("results_number", "10"));
+        AUTO_PLAY = PowerPreference.getDefaultFile().getBoolean("auto_play", false);
     }
 
 

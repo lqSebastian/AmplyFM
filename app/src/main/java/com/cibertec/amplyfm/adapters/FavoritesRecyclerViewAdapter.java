@@ -110,7 +110,8 @@ public class FavoritesRecyclerViewAdapter   extends RecyclerView.Adapter<Favorit
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(0,3 , 1, "Eliminar");
+            menu.add(0, 4, 1, "Ver Letra");
+            menu.add(0, 3, 2, "Eliminar");
         }
     }
 }
