@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
     MaterialSearchView searchView;
 
-
+    //Preferences
     private Integer MAX_RESULTS;
     private Boolean AUTO_PLAY;
 
