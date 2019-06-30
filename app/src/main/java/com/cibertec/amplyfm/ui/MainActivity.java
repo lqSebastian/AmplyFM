@@ -1,45 +1,39 @@
 package com.cibertec.amplyfm.ui;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.cibertec.amplyfm.R;
 import com.cibertec.amplyfm.adapters.PagerAdapter;
-import com.cibertec.amplyfm.adapters.TrackRecyclerViewAdapter;
 import com.cibertec.amplyfm.models.Artist;
 import com.cibertec.amplyfm.models.ArtistInfoResponse;
+import com.cibertec.amplyfm.models.Search.Artistmatches;
+import com.cibertec.amplyfm.models.Search.Results;
+import com.cibertec.amplyfm.models.Search.SearchResults;
 import com.cibertec.amplyfm.models.SimilarArtist;
 import com.cibertec.amplyfm.models.SimilarArtistResponse;
 import com.cibertec.amplyfm.models.TopTracks;
-import com.cibertec.amplyfm.models.Track;
 import com.cibertec.amplyfm.models.TopTracksResponse;
+import com.cibertec.amplyfm.models.Track;
 import com.cibertec.amplyfm.models.Youtube.Id;
 import com.cibertec.amplyfm.models.Youtube.Item;
 import com.cibertec.amplyfm.models.Youtube.YoutubeUrl;
 import com.cibertec.amplyfm.network.GetArtistInfo;
+import com.cibertec.amplyfm.network.SearchArtist;
 import com.cibertec.amplyfm.network.TopArtistTracksService;
 import com.cibertec.amplyfm.network.YoutubeVideoIdService;
 import com.cibertec.amplyfm.ui.fragments.ArtistInfoFragment;
@@ -50,12 +44,13 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnEditorAction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,7 +69,7 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
     ViewPager mViewPager;
 
     @BindView(R.id.edt_search)
-    SearchView edt_search;
+    EditText edt_search;
 
     //MainPagerAdapter mAdapter;
     @BindView(R.id.youtube_player_view)
@@ -87,6 +82,8 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
      PagerAdapter adapter;
 
+    MaterialSearchView searchView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,10 +94,55 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
         getLifecycle().addObserver(youTubePlayerView);
 
-        edt_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+
+        searchView = (MaterialSearchView) findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String newText) {
-                //Log.e("onQueryTextChange", "called");
+                if (newText.length() < 1) {
+                    return false;
+                }
+                SearchArtist searchArtist = retrofit.create(SearchArtist.class);
+                Call<SearchResults> searchResultsCall = searchArtist.searchArtist(newText, Constants.API_KEY);
+                searchResultsCall.enqueue(new Callback<SearchResults>() {
+                    @Override
+                    public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
+                        if (response.isSuccessful()) {
+                            SearchResults searchResults = response.body();
+                            if (searchResults == null) {
+                                return;
+                            }
+
+                            Results results = searchResults.getResults();
+                            Artistmatches artistmatches = results.getArtistmatches();
+                            List<Artist> artistList = artistmatches.getArtist();
+
+
+                            List<String> suggestions = new ArrayList<>();
+
+                            for (int i = 0; i < artistList.size(); i++) {
+                                if (artistList.get(i).getName() == null) {
+                                    continue;
+                                }
+                                suggestions.add(artistList.get(i).getName());
+
+                            }
+                            searchView.clearSuggestions();
+                            searchView.addSuggestions(suggestions);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<SearchResults> call, Throwable t) {
+                    }
+                });
+
+
                 return false;
             }
             @Override
@@ -116,12 +158,21 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
         });
 
+        searchView.setOnItemClickListener((parent, view, position, id) -> {
+            // Do something when the suggestion list is clicked.
+            String suggestion = searchView.getSuggestionAtPosition(position);
+
+            searchView.setQuery(suggestion, false);
+        });
+
 
     }
 
+
     @OnClick(R.id.edt_search)
     public void OnClickSearchView(View view) {
-        edt_search.setIconified(false);
+        edt_search.clearFocus();
+        searchView.openSearch();
     }
 
     @Override
@@ -185,6 +236,8 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
 
     private String searchArtisTracks(final String query){
+        edt_search.setText(query);
+
         progressBar.setVisibility(View.VISIBLE);
 
         //------------  TOP TRACKS -----------//
@@ -320,10 +373,18 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
         return true;
     }
 
-
-
     public void displayMessage(String message){
         Snackbar.make(findViewById(R.id.rootView) , message,Snackbar.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onBackPressed() {
+        if (searchView.isOpen()) {
+            searchView.closeSearch();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 
 }
