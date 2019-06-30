@@ -3,7 +3,6 @@
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cv_artist_info_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -66,19 +65,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_artist_listeners_count" />
 
-        <EditText
+        <TextView
             android:id="@+id/et_artist_bio"
             android:layout_width="346dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:editable="false"
             android:ems="10"
             android:gravity="start|top"
-            android:inputType="textMultiLine"
             android:textColor="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:textIsSelectable="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_artist_listeners_count" />
     </androidx.constraintlayout.widget.ConstraintLayout>

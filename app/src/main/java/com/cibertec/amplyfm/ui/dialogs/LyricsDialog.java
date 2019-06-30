@@ -1,18 +1,13 @@
 package com.cibertec.amplyfm.ui.dialogs;
 
-import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.os.Bundle;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -91,5 +86,6 @@ public class LyricsDialog  extends DialogFragment {
     @OnClick(R.id.action_copy_all)
     public void CopyToClipboard(View view) {
         CopyToCb.setClipboard(view.getContext(),tvLyrics.getText() + "");
+        Toast.makeText(getContext(), "Letra copiada al portapapeles", Toast.LENGTH_SHORT).show();
     }
 }

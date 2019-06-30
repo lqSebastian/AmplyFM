@@ -119,27 +119,33 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
                     @Override
                     public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
                         if (response.isSuccessful()) {
-                            SearchResults searchResults = response.body();
-                            if (searchResults == null) {
-                                return;
-                            }
+                            try {
 
-                            Results results = searchResults.getResults();
-                            Artistmatches artistmatches = results.getArtistmatches();
-                            List<Artist> artistList = artistmatches.getArtist();
-
-
-                            List<String> suggestions = new ArrayList<>();
-
-                            for (int i = 0; i < artistList.size(); i++) {
-                                if (artistList.get(i).getName() == null) {
-                                    continue;
+                                SearchResults searchResults = response.body();
+                                if (searchResults == null) {
+                                    return;
                                 }
-                                suggestions.add(artistList.get(i).getName());
 
+                                Results results = searchResults.getResults();
+                                Artistmatches artistmatches = results.getArtistmatches();
+                                List<Artist> artistList = artistmatches.getArtist();
+
+
+                                List<String> suggestions = new ArrayList<>();
+
+                                for (int i = 0; i < artistList.size(); i++) {
+                                    if (artistList.get(i).getName() == null) {
+                                        continue;
+                                    }
+                                    suggestions.add(artistList.get(i).getName());
+
+                                }
+                                searchView.clearSuggestions();
+                                searchView.addSuggestions(suggestions);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                            searchView.clearSuggestions();
-                            searchView.addSuggestions(suggestions);
+
                         }
                     }
 
@@ -184,8 +190,8 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
     @Override
     public void onListFragmentInteraction(Track model) {
         // the user clicked on this item over the list
-        Toast.makeText(MainActivity.this,
-                model.getName(), Toast.LENGTH_LONG).show();
+        displayMessage("Buscando " + model.getName() + "...");
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL_YT)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -358,7 +364,7 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                Toast.makeText(MainActivity.this, "Tab selected " +  tab.getPosition(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(MainActivity.this, "Tab selected " +  tab.getPosition(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
