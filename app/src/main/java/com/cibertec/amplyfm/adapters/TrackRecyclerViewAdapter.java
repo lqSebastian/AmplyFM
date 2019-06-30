@@ -26,6 +26,7 @@ import com.cibertec.amplyfm.utils.DurationConverter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -45,8 +46,20 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
 
     private AsyncTask mTask;
 
+    Call<TrackInfoResponse> trackInfoCall;
+    Call<ImageResponse> imageResponseCall;
+    List<Integer> currentCalls = new ArrayList<>();
+    private Boolean CANCEL_ALL = false;
+
     public TrackRecyclerViewAdapter(Track[] items, TopTracksFragment.OnListFragmentInteractionListener listener) {
         try {
+            if (trackInfoCall != null && trackInfoCall.isExecuted()) {
+                trackInfoCall.cancel();
+            }
+            if (imageResponseCall != null && imageResponseCall.isExecuted()) {
+                imageResponseCall.cancel();
+            }
+
             //cancelar todos los async por si se hacen busquedas seguidas en corto plazo
             mTask.cancel(true);
         } catch (Exception e) {
@@ -96,6 +109,7 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
         Track dm = trackList[position];
 
         holder.trackItem = dm;
+
         holder.trackNameView.setText(dm.getName());
         holder.playCountView.setText(String.valueOf(dm.getPlaycount()));
 
@@ -218,11 +232,15 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
         @Override
         protected String doInBackground(String... params) {
             try {
-
+                if (currentCalls.contains(positionAsync) || CANCEL_ALL) {
+                    return "false";
+                } else {
+                    currentCalls.add(positionAsync);
+                }
 
                 dm = tracksAsync[positionAsync];
                 GetTrackInfo getTrackInfo = retrofitLastFM.create(GetTrackInfo.class);
-                Call<TrackInfoResponse> trackInfoCall = getTrackInfo.getTrackInfo(dm.getArtist().getName(), dm.getName(), Constants.API_KEY);
+                trackInfoCall = getTrackInfo.getTrackInfo(dm.getArtist().getName(), dm.getName(), Constants.API_KEY);
 
                 TrackInfoResponse trackInfoResponse = trackInfoCall.execute().body();
                 dm = trackInfoResponse.getTrack();
@@ -236,7 +254,7 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
 
                 GetImage getImage = retrofitBing.create(GetImage.class);
 
-                Call<ImageResponse> imageResponseCall = getImage.getImage(dm.getArtist().getName() + " " + albumTitle);
+                imageResponseCall = getImage.getImage(dm.getArtist().getName() + " " + albumTitle);
 
 
                 ImageResponse imageResponse = imageResponseCall.execute().body();
@@ -257,8 +275,13 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            if (result != null && result.equals("false")) {
 
-            updateTrackList(trackList[positionAsync], positionAsync);
+            } else {
+                updateTrackList(trackList[positionAsync], positionAsync);
+
+            }
+
         }
 
         @Override
@@ -269,6 +292,23 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
         protected void onProgressUpdate(Void... values) {
         }
     }
+
+    public void onDestroy() {
+        try {
+            if (trackInfoCall != null && trackInfoCall.isExecuted()) {
+                trackInfoCall.cancel();
+            }
+            if (imageResponseCall != null && imageResponseCall.isExecuted()) {
+                imageResponseCall.cancel();
+            }
+            CANCEL_ALL = true;
+
+            //cancelar todos los async por si se hacen busquedas seguidas en corto plazo
+            mTask.cancel(true);
+        } catch (Exception e) {
+        }
+    }
+
 
 }
 

@@ -1,37 +1,28 @@
 package com.cibertec.amplyfm.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import com.cibertec.amplyfm.AppDatabase;
 import com.cibertec.amplyfm.R;
-import com.cibertec.amplyfm.adapters.FavoritesRecyclerViewAdapter;
-import com.cibertec.amplyfm.adapters.PagerAdapter;
 import com.cibertec.amplyfm.adapters.SinglePageAdapter;
 import com.cibertec.amplyfm.models.FavoriteTracks.FavoriteItem;
-import com.cibertec.amplyfm.models.SimilarArtist;
-import com.cibertec.amplyfm.models.Track;
 import com.cibertec.amplyfm.models.Youtube.Id;
 import com.cibertec.amplyfm.models.Youtube.Item;
 import com.cibertec.amplyfm.models.Youtube.YoutubeUrl;
 import com.cibertec.amplyfm.network.YoutubeVideoIdService;
 import com.cibertec.amplyfm.ui.fragments.FavoritesFragment;
-import com.cibertec.amplyfm.ui.fragments.TopTracksFragment;
 import com.cibertec.amplyfm.utils.Constants;
 import com.google.android.material.tabs.TabLayout;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
+import com.preference.PowerPreference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +53,8 @@ public class FavoritesActivity extends AppCompatActivity implements FavoritesFra
 
     private  FavoritesFragment.OnListFragmentInteractionListener interactionListener;
 
+    private Boolean AUTO_PLAY;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +64,9 @@ public class FavoritesActivity extends AppCompatActivity implements FavoritesFra
         getLifecycle().addObserver(youTubePlayerView);
 
         loadItems();
+
+        AUTO_PLAY = PowerPreference.getDefaultFile().getBoolean("auto_play", false);
+
     }
 
     public void loadItems() {
@@ -120,11 +116,16 @@ public class FavoritesActivity extends AppCompatActivity implements FavoritesFra
                     Id id = items.get(0).getId();
 
                     String videoId = id.getVideoId();
+                    if (AUTO_PLAY) {
+                        youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
+                            youTubePlayer.loadVideo(videoId, 0);
+                        });
+                    } else {
+                        youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
+                            youTubePlayer.cueVideo(videoId, 0);
+                        });
+                    }
 
-
-                    youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
-                        youTubePlayer.cueVideo( videoId, 0);
-                    });
                 }
 
             }

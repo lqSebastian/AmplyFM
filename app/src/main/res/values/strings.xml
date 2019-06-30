@@ -21,4 +21,12 @@
     <string name="cerrar_string">Cerrar</string>
     <string name="copy_to_clipboard" />
     <string name="copy_to">Copiar todo</string>
+
+    <string name="action_exit">Salir</string>
+    <string name="string_favorites">Favoritos</string>
+    <string name="action_config">Opciones</string>
+
+
+    <string name="version">Beta 0.2</string>
+    <string name="send_feedback">Enviar Feedback</string>
 </resources>

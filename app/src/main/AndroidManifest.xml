@@ -16,7 +16,15 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:label">
         <activity android:name=".ui.FavoritesActivity"
-            android:label="Favorites"
+            android:label="Favoritos"
+            android:parentActivityName="com.cibertec.amplyfm.ui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cibertec.amplyfm.ui.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:label="Opciones"
             android:parentActivityName="com.cibertec.amplyfm.ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

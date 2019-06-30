@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="prefs_auto_play"
+        android:title="Reproducir vídeos automáticamente" />
+
+    <EditTextPreference
+        android:defaultValue="10"
+        android:key="results_number"
+        android:title="Máximo nro. de resultados"
+        android:digits="0123456789"
+        android:inputType="number"
+        android:maxLength="2" />
+
+    <Preference
+        android:key="@string/send_feedback"
+        android:summary="Apreciamos tus comentarios. ¿Qué te gustó o no te gustó?"
+        android:title="Enviar Feedback" />
+
+
+    <Preference
+        android:key="version"
+        android:summary="@string/version"
+        android:title="Versión" />
+
+    <Preference
+        android:key="copyright"
+        android:summary="Sebastian © 2019."
+        android:title="Copyright" />
+
+
+</PreferenceScreen>

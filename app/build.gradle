@@ -65,4 +65,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     implementation 'br.com.mauker.materialsearchview:materialsearchview:1.2.3'
+
+    implementation 'com.aliassadi:power-preference-lib:1.4.1'
+
 }

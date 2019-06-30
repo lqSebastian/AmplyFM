@@ -48,6 +48,8 @@ public class TopTracksFragment extends Fragment {
     private Track[] trackList;
     private OnListFragmentInteractionListener interactionListener;
     RecyclerView recyclerView;
+
+    TrackRecyclerViewAdapter recyclerViewAdapter;
     public TopTracksFragment(){
 
     }
@@ -80,7 +82,7 @@ public class TopTracksFragment extends Fragment {
 
         Context context = view.getContext();
          recyclerView = (RecyclerView) view;
-        TrackRecyclerViewAdapter recyclerViewAdapter = new TrackRecyclerViewAdapter(trackList, interactionListener);
+        recyclerViewAdapter = new TrackRecyclerViewAdapter(trackList, interactionListener);
         recyclerViewAdapter.setHasStableIds(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -106,6 +108,7 @@ public class TopTracksFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         interactionListener = null;
+        recyclerViewAdapter.onDestroy();
     }
 
 

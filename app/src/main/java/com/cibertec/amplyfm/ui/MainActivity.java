@@ -43,6 +43,7 @@ import com.cibertec.amplyfm.utils.Constants;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
+import com.preference.PowerPreference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +85,10 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
     MaterialSearchView searchView;
 
+
+    private Integer MAX_RESULTS;
+    private Boolean AUTO_PLAY;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +99,8 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
         getLifecycle().addObserver(youTubePlayerView);
 
+        MAX_RESULTS = Integer.valueOf(PowerPreference.getDefaultFile().getString("results_number", "10"));
+        AUTO_PLAY = PowerPreference.getDefaultFile().getBoolean("auto_play", false);
         retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -205,10 +212,16 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
                     String videoId = id.getVideoId();
 
+                    if (AUTO_PLAY) {
+                        youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
+                            youTubePlayer.loadVideo(videoId, 0);
+                        });
+                    } else {
+                        youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
+                            youTubePlayer.cueVideo(videoId, 0);
+                        });
+                    }
 
-                    youTubePlayerView.getYouTubePlayerWhenReady(youTubePlayer -> {
-                        youTubePlayer.cueVideo( videoId, 0);
-                    });
                 }
 
             }
@@ -246,7 +259,7 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TopArtistTracksService topArtistTracksService =  retrofit.create(TopArtistTracksService.class);
-        Call<TopTracksResponse> searchTracks = topArtistTracksService.getTopTracks(query,Constants.TOP_ITEMS_LIMIT,Constants.API_KEY);
+        Call<TopTracksResponse> searchTracks = topArtistTracksService.getTopTracks(query, MAX_RESULTS, Constants.API_KEY);
 
         searchTracks.enqueue(new Callback<TopTracksResponse>() {
             @Override
@@ -368,9 +381,19 @@ public class MainActivity extends AppCompatActivity  implements TopTracksFragmen
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent(this, FavoritesActivity.class);
-        startActivity(intent);
-        return true;
+        switch (item.getItemId()) {
+            case R.id.action_favorites:
+                Intent intent = new Intent(this, FavoritesActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_config:
+                startActivity(new Intent(this, SettingsActivity.class));
+            case R.id.action_exit:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void displayMessage(String message){

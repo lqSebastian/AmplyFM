@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/item_favorites"
+        android:id="@+id/action_favorites"
         android:icon="@android:drawable/star_big_off"
-        android:title="@string/favorites_string"
+        android:orderInCategory="1"
+        android:title="@string/string_favorites"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_config"
+        android:orderInCategory="100"
+        android:title="@string/action_config"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_exit"
+        android:orderInCategory="100"
+        android:title="@string/action_exit"
+        app:showAsAction="never" />
 </menu>
