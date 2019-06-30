@@ -255,12 +255,18 @@ public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackRecycler
                 GetImage getImage = retrofitBing.create(GetImage.class);
 
                 imageResponseCall = getImage.getImage(dm.getArtist().getName() + " " + albumTitle);
+                try {
+                    ImageResponse imageResponse = imageResponseCall.execute().body();
+                    List<Value> items = imageResponse.getValue();
+                    imageUrl = items.get(0).getThumbnailUrl();
 
+                } catch (final java.net.SocketTimeoutException e) {
+                    ImageResponse imageResponse = imageResponseCall.execute().body();
+                    List<Value> items = imageResponse.getValue();
+                    imageUrl = items.get(0).getThumbnailUrl();
 
-                ImageResponse imageResponse = imageResponseCall.execute().body();
-                List<Value> items = imageResponse.getValue();
-                imageUrl = items.get(0).getThumbnailUrl();
-
+                    e.printStackTrace();
+                }
                 dm.setImgUrl(imageUrl);
 
                 tracksAsync[positionAsync] = dm;
